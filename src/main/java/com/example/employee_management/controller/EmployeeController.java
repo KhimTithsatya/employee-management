@@ -1,7 +1,8 @@
 package com.example.employee_management.controller;
 
 import com.example.employee_management.model.Employee;
-import com.example.employee_management.repository.EmployeeRepository;
+import com.example.employee_management.model.EmployeeStatus;
+import com.example.employee_management.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,44 +12,109 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class EmployeeController {
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-    // READ - Get all employees
+       // GET ALL EMPLOYEES
+
     @GetMapping
     public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+        return employeeService.getAllEmployees();
     }
 
-    // CREATE - Add employee
+
+
+    // GET EMPLOYEE BY ID
+
+    @GetMapping("/{id}")
+    public Employee getEmployeeById(@PathVariable Long id) {
+        return employeeService.getEmployeeById(id);
+    }
+
+
+    // GET EMPLOYEE BY CODE
+
+    @GetMapping("/code/{employeeCode}")
+    public Employee getEmployeeByCode(
+            @PathVariable String employeeCode) {
+
+        return employeeService.getEmployeeByCode(employeeCode);
+    }
+
+
+    // GET EMPLOYEE BY EMAIL
+
+    @GetMapping("/email/{email}")
+    public Employee getEmployeeByEmail(
+            @PathVariable String email) {
+
+        return employeeService.getEmployeeByEmail(email);
+    }
+
+
+    // =========================
+    // SEARCH BY NAME
+    // =========================
+
+    @GetMapping("/search")
+    public List<Employee> searchEmployees(
+            @RequestParam String name) {
+
+        return employeeService.searchByName(name);
+    }
+
+
+
+    // FILTER BY DEPARTMENT
+
+    @GetMapping("/department/{department}")
+    public List<Employee> getEmployeesByDepartment(
+            @PathVariable String department) {
+
+        return employeeService.getEmployeesByDepartment(department);
+    }
+
+
+
+    // FILTER BY STATUS
+
+    @GetMapping("/status/{status}")
+    public List<Employee> getEmployeesByStatus(
+            @PathVariable EmployeeStatus status) {
+
+        return employeeService.getEmployeesByStatus(status);
+    }
+
+
+    // CREATE EMPLOYEE
+
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeRepository.save(employee);
+    public Employee createEmployee(
+            @RequestBody Employee employee) {
+
+        return employeeService.createEmployee(employee);
     }
 
-    // UPDATE - Update employee
+
+    // UPDATE EMPLOYEE
+
     @PutMapping("/{id}")
     public Employee updateEmployee(
             @PathVariable Long id,
             @RequestBody Employee employee) {
 
-        Employee existingEmployee = employeeRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
-
-        existingEmployee.setName(employee.getName());
-        existingEmployee.setPosition(employee.getPosition());
-        existingEmployee.setPhoneNumber(employee.getPhoneNumber());
-
-        return employeeRepository.save(existingEmployee);
+        return employeeService.updateEmployee(id, employee);
     }
 
-    // DELETE - Delete employee
+
+    // DELETE EMPLOYEE
+
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
-        employeeRepository.deleteById(id);
+
+        employeeService.deleteEmployee(id);
     }
 }
